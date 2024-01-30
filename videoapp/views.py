@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ViewSet,ModelViewSet
 from rest_framework.response import Response
-from videoapp.models import Video,Member,Event,VideoMember,Session
-from videoapp.serializers import VideoMemberSerializer,VideoSerializer,SessionSerializer,EventSerializer,MemberSerializer
+from rest_framework.decorators import action
+from videoapp.models import Video,Member,Event,Session
+from videoapp.serializers import VideoSerializer,SessionSerializer,EventSerializer,MemberSerializer
 
 
 
@@ -49,55 +50,30 @@ class EventView(ViewSet):
         return Response(data={"msg":"deleted"})
 
 
-class SessionView(ViewSet):
-
-    def create(self,request,*args, **kwargs):
-        serializer=SessionSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data=serializer.data)
+class SessionView(ModelViewSet):
+    serializer_class=SessionSerializer
+    queryset=Session.objects.all()
         
-        else:
-            return Response(data=serializer.errors)
-        
-
-    def list(self,request,*args, **kwargs):
-        qs=Session.objects.all()
-        serializer=SessionSerializer(qs,many=True)
+    @action(methods=["get"],detail=True)
+    def video_by_session(self,request,*args, **kwargs):
+        id=kwargs.get("pk")
+        qs=Video.objects.get(session_id=id)
+        serializer=VideoSerializer(qs)
         return Response(data=serializer.data)
-    
-    def update(self,request,*args, **kwargs):
-        id=kwargs.get("pk")
-        qs=Session.objects.get(id=id)
-        serializer=SessionSerializer(data=request.data,instance=qs)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data=serializer.data)
-        
-        else:
-            return Response(data=serializer.errors)
-        
-    
 
-    def retrieve(self,request,*args, **kwargs):
-        id=kwargs.get("pk")
-        qs=Session.objects.get(id=id)
-        serializer=SessionSerializer(qs)
-        return Response(data=serializer.data)
-    
-
-    def delete(self,request,*args, **kwargs):
-        id=kwargs.get("pk")
-        Session.objects.get(id=id).delete()
-        return Response(data={"msg":"deleted"})
-
+  
 
 class VideoView(ModelViewSet):
     serializer_class=VideoSerializer
     queryset=Video.objects.all()
 
-    def my_view(request):
-     print(request.body)
+    @action(methods=["get"],detail=True)
+    def members(self, request, pk=None):
+        video = self.get_object()  
+        members = video.member_id.all()  
+        serializer = MemberSerializer(members, many=True) 
+        return Response(serializer.data)
+
 
 
 
@@ -144,47 +120,6 @@ class MemberView(ViewSet):
         return Response(data={"msg":"deleted"})
     
 
-class VideoMemberView(ViewSet):
-
-    def create(self,request,*args, **kwargs):
-        serializer=VideoMemberSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data=serializer.data)
-        
-        else:
-            return Response(data=serializer.errors)
-        
-
-    def list(self,request,*args, **kwargs):
-        qs=VideoMember.objects.all()
-        serializer=EventSerializer(qs,many=True)
-        return Response(data=serializer.data)
-    
-    def update(self,request,*args, **kwargs):
-        id=kwargs.get("pk")
-        qs=VideoMember.objects.get(id=id)
-        serializer=VideoMemberSerializer(data=request.data,instance=qs)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(data=serializer.data)
-        
-        else:
-            return Response(data=serializer.errors)
-        
-    
-
-    def retrieve(self,request,*args, **kwargs):
-        id=kwargs.get("pk")
-        qs=VideoMember.objects.get(id=id)
-        serializer=VideoMemberSerializer(qs)
-        return Response(data=serializer.data)
-    
-
-    def delete(self,request,*args, **kwargs):
-        id=kwargs.get("pk")
-        VideoMember.objects.get(id=id).delete()
-        return Response(data={"msg":"deleted"})
 
 
 

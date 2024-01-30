@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from videoapp.models import Event, Member, Session, Video, VideoMember
+from videoapp.models import Event, Member, Session, Video
 
 class EventSerializer(serializers.ModelSerializer):
     is_active=serializers.CharField(read_only=True)
@@ -30,7 +30,3 @@ class VideoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class VideoMemberSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VideoMember
-        fields= '__all__'

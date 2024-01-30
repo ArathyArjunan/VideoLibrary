@@ -40,7 +40,7 @@ class Video(models.Model):
     title=models.CharField(max_length=200)
     description=models.CharField(max_length=300)
     subject=models.CharField(max_length=200)
-    video_file=models.FileField(upload_to="videos/")
+    video_file=models.URLField()
     upload_date=models.DateTimeField()
     uploader=models.ForeignKey(User,on_delete=models.CASCADE)
     session_id=models.ForeignKey(Session,on_delete=models.CASCADE)
@@ -51,9 +51,3 @@ class Video(models.Model):
         return self.title
 
 
-class VideoMember(models.Model):
-    video=models.ForeignKey(Video,null=True,on_delete=models.SET_NULL)
-    member=models.ForeignKey(Member,null=True,on_delete=models.SET_NULL)
-
-    def __str__(self) :
-        return self.member.member_name
